@@ -73,7 +73,7 @@ mo_lookup(struct molist *molist, struct intf_data *id, union uaddr *addr)
 
 	LIST_FOREACH(mo, molist, mo_entry) {
 		addrsize = (mo->mo_af == AF_INET) ?
-			sizeof(addr->v4) : sizeof(addr->v6);
+		    sizeof(addr->v4) : sizeof(addr->v6);
 		if (id != NULL && id != mo->mo_id)
 			continue;
 		if (memcmp(addr, &mo->mo_addr, addrsize) != 0)

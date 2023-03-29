@@ -699,7 +699,6 @@ mcast_addroute(unsigned short pvidx, union uaddr *origin,
 			    id->id_name, vidx);
 	}
 
-
 	if (setsockopt(igmpsd, IPPROTO_IP, MRT_ADD_MFC, &mfcc,
 	    sizeof(mfcc)) == -1) {
 		log_warn("%s: setsockopt MRT_ADD_MFC", __func__);
@@ -757,7 +756,6 @@ mcast_addroute6(unsigned short pvidx, union uaddr *origin,
 			log_debug("  mif %s (%d) disabled",
 			    id->id_name, vidx);
 	}
-
 
 	if (setsockopt(mldsd, IPPROTO_IPV6, MRT6_ADD_MFC, &mf6cc,
 	    sizeof(mf6cc)) == -1) {
@@ -1012,8 +1010,8 @@ if_newaddr(unsigned short ifindex, struct sockaddr *ifa, struct sockaddr *mask)
 
 	switch (ifa->sa_family) {
 	case AF_INET:
-		ifa4 = (struct sockaddr_in *) ifa;
-		mask4 = (struct sockaddr_in *) mask;
+		ifa4 = (struct sockaddr_in *)ifa;
+		mask4 = (struct sockaddr_in *)mask;
 
 		/* filter out unwanted addresses */
 		if (bad_addr_v4(ifa4->sin_addr))
@@ -1033,8 +1031,8 @@ if_newaddr(unsigned short ifindex, struct sockaddr *ifa, struct sockaddr *mask)
 		    addr4tostr(&ifa4->sin_addr), ia->ia_prefixlen);
 		break;
 	case AF_INET6:
-		ifa6 = (struct sockaddr_in6 *) ifa;
-		mask6 = (struct sockaddr_in6 *) mask;
+		ifa6 = (struct sockaddr_in6 *)ifa;
+		mask6 = (struct sockaddr_in6 *)mask;
 
 		/* We only care about link-local and global-scope. */
 		if (bad_addr_v6(&ifa6->sin6_addr))
@@ -1105,8 +1103,8 @@ if_deladdr(unsigned short ifindex, struct sockaddr *ifa, struct sockaddr *mask)
 	iac.ia_af = ifa->sa_family;
 	switch (ifa->sa_family) {
 	case AF_INET:
-		ifa4 = (struct sockaddr_in *) ifa;
-		mask4 = (struct sockaddr_in *) mask;
+		ifa4 = (struct sockaddr_in *)ifa;
+		mask4 = (struct sockaddr_in *)mask;
 
 		/* filter out unwanted addresses */
 		if (bad_addr_v4(ifa4->sin_addr))
@@ -1122,8 +1120,8 @@ if_deladdr(unsigned short ifindex, struct sockaddr *ifa, struct sockaddr *mask)
 		    addr4tostr(&ifa4->sin_addr), iac.ia_prefixlen);
 		break;
 	case AF_INET6:
-		ifa6 = (struct sockaddr_in6 *) ifa;
-		mask6 = (struct sockaddr_in6 *) mask;
+		ifa6 = (struct sockaddr_in6 *)ifa;
+		mask6 = (struct sockaddr_in6 *)mask;
 
 		/* We only care about link-local and global-scope. */
 		if (bad_addr_v6(&ifa6->sin6_addr))
