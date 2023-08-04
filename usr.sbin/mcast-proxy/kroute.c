@@ -43,8 +43,7 @@ int vif4_nextvidx(void);
 int vif6_nextvidx(void);
 
 void if_announce(struct if_announcemsghdr *);
-void if_update(unsigned short, int, struct if_data *,
-    struct sockaddr_dl *sdl);
+void if_update(unsigned short, int, struct if_data *, struct sockaddr_dl *);
 void if_newaddr(unsigned short, struct sockaddr *, struct sockaddr *);
 void if_deladdr(unsigned short, struct sockaddr *, struct sockaddr *);
 void get_rtaddrs(int, struct sockaddr *, struct sockaddr **);
