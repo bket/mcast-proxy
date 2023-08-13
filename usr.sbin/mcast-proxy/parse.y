@@ -631,10 +631,9 @@ symset(const char *nam, const char *val, int persist)
 {
 	struct sym	*sym;
 
-	TAILQ_FOREACH(sym, &symhead, entry) {
+	TAILQ_FOREACH(sym, &symhead, entry)
 		if (strcmp(nam, sym->nam) == 0)
 			break;
-	}
 
 	if (sym != NULL) {
 		if (sym->persist == 1)

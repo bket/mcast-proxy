@@ -214,9 +214,8 @@ daemon_shutdown(void)
 	upstreamif = NULL;
 
 	/* Remove all interfaces. */
-	SLIST_FOREACH_SAFE(id, &iflist, id_entry, idn) {
+	SLIST_FOREACH_SAFE(id, &iflist, id_entry, idn)
 		id_free(id);
-	}
 
 	/* Close multicast sockets. */
 	error |= close_igmp_socket(igmpsd);
@@ -555,7 +554,7 @@ igmp_parse(uint8_t *p, size_t *plen, struct sockaddr_storage *src)
 
 	*plen -= hlen;
 
-	return ((struct igmp *)(p + hlen));
+	return (struct igmp *)(p + hlen);
 }
 
 void

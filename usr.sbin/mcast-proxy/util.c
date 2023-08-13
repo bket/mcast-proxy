@@ -149,10 +149,9 @@ intf_lookupbyname(const char *ifname)
 {
 	struct intf_data	*id;
 
-	SLIST_FOREACH(id, &iflist, id_entry) {
+	SLIST_FOREACH(id, &iflist, id_entry)
 		if (strcmp(id->id_name, ifname) == 0)
 			return id;
-	}
 
 	return NULL;
 }
@@ -162,10 +161,9 @@ intf_lookupbyindex(unsigned short index)
 {
 	struct intf_data	*id;
 
-	SLIST_FOREACH(id, &iflist, id_entry) {
+	SLIST_FOREACH(id, &iflist, id_entry)
 		if (id->id_index == index)
 			return id;
-	}
 
 	return NULL;
 }
@@ -175,10 +173,9 @@ intf_lookupbyaddr4(uint32_t addr)
 {
 	struct intf_data	*id;
 
-	SLIST_FOREACH(id, &iflist, id_entry) {
+	SLIST_FOREACH(id, &iflist, id_entry)
 		if (id_matchaddr4(id, addr))
 			return id;
-	}
 
 	return NULL;
 }
@@ -188,10 +185,9 @@ intf_lookupbyaddr6(struct in6_addr *addr)
 {
 	struct intf_data	*id;
 
-	SLIST_FOREACH(id, &iflist, id_entry) {
+	SLIST_FOREACH(id, &iflist, id_entry)
 		if (id_matchaddr6(id, addr))
 			return id;
-	}
 
 	return NULL;
 }
@@ -233,10 +229,10 @@ ia_inserttail(struct ialist *ial, struct intf_addr *ia)
 {
 	struct intf_addr	*ian;
 
-	SLIST_FOREACH(ian, ial, ia_entry) {
+	SLIST_FOREACH(ian, ial, ia_entry)
 		if (SLIST_NEXT(ian, ia_entry) == NULL)
 			break;
-	}
+
 	if (ian != NULL)
 		SLIST_INSERT_AFTER(ian, ia, ia_entry);
 	else
@@ -308,9 +304,9 @@ uint8_t
 mask2prefixlen(in_addr_t ina)
 {
 	if (ina == 0)
-		return (0);
+		return 0;
 	else
-		return (33 - ffs(ntohl(ina)));
+		return 33 - ffs(ntohl(ina));
 }
 
 uint8_t
@@ -332,42 +328,42 @@ mask2prefixlen6(struct sockaddr_in6 *sa_in6)
 			break;
 		case 0xfe:
 			l += 7;
-			return (l);
+			return l;
 		case 0xfc:
 			l += 6;
-			return (l);
+			return l;
 		case 0xf8:
 			l += 5;
-			return (l);
+			return l;
 		case 0xf0:
 			l += 4;
-			return (l);
+			return l;
 		case 0xe0:
 			l += 3;
-			return (l);
+			return l;
 		case 0xc0:
 			l += 2;
-			return (l);
+			return l;
 		case 0x80:
 			l += 1;
-			return (l);
+			return l;
 		case 0x00:
-			return (l);
+			return l;
 		default:
 			fatalx("%s: non contiguous inet6 netmask", __func__);
 		}
 	}
 
-	return (l);
+	return l;
 }
 
 in_addr_t
 prefixlen2mask(uint8_t prefixlen)
 {
 	if (prefixlen == 0)
-		return (0);
+		return 0;
 
-	return (htonl(0xffffffff << (32 - prefixlen)));
+	return htonl(0xffffffff << (32 - prefixlen));
 }
 
 void

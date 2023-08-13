@@ -200,9 +200,8 @@ mrt_querytimeradd(void)
 	struct multicast_route	*mr;
 
 	/* Activate all group expire timers. */
-	RB_FOREACH(mr, mrtree, &mrtree) {
+	RB_FOREACH(mr, mrtree, &mrtree)
 		mrt_timeradd(&mr->mr_timer);
-	}
 }
 
 void
@@ -313,9 +312,8 @@ mrt_free(struct multicast_route *mr)
 	if (evtimer_pending(&mr->mr_vtimer, &tv))
 		evtimer_del(&mr->mr_vtimer);
 
-	LIST_FOREACH_SAFE(mo, &mr->mr_molist, mo_entry, mon) {
+	LIST_FOREACH_SAFE(mo, &mr->mr_molist, mo_entry, mon)
 		_mrt_delorigin(mr, mo);
-	}
 
 	ss.ss_family = mr->mr_af;
 	if (ss.ss_family == AF_INET)
@@ -335,9 +333,8 @@ mrt_cleanup(void)
 {
 	struct multicast_route	*mr, *mrn;
 
-	RB_FOREACH_SAFE(mr, mrtree, &mrtree, mrn) {
+	RB_FOREACH_SAFE(mr, mrtree, &mrtree, mrn)
 		mrt_free(mr);
-	}
 }
 
 struct multicast_route *
