@@ -505,20 +505,20 @@ igmp_parse(uint8_t *p, size_t *plen, struct sockaddr_storage *src)
 	/* IP header validations. */
 	if (ip->ip_v != IPVERSION) {
 		log_debug("%s: wrong IP version", __func__);
-		return 0;
+		return NULL;
 	}
 	hlen = ip->ip_hl << 2;
 	if (hlen < sizeof(*ip)) {
 		log_debug("%s: wrong IP header length", __func__);
-		return 0;
+		return NULL;
 	}
 	if ((ip->ip_off & htons(IP_OFFMASK)) != 0) {
 		log_debug("%s: fragmented packet", __func__);
-		return 0;
+		return NULL;
 	}
 	if (ip->ip_ttl == 0) {
 		log_debug("%s: invalid TTL", __func__);
-		return 0;
+		return NULL;
 	}
 
 	hlen = ip->ip_hl << 2;
@@ -527,7 +527,7 @@ igmp_parse(uint8_t *p, size_t *plen, struct sockaddr_storage *src)
 	if (*plen != ptotal) {
 		log_debug("%s: IP header length different than packet "
 		    "(%ld vs %ld)", __func__, ptotal, *plen);
-		return 0;
+		return NULL;
 	}
 
 	cksum = wrapsum(checksum((uint8_t *)ip, hlen, 0));
