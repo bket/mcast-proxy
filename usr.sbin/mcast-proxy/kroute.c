@@ -843,8 +843,8 @@ intf_init(void)
 {
 	size_t		 len;
 	int		 mib[6];
+	int		 defrcvbuf, opt, rcvbuf, sd;
 	uint8_t		*buf;
-	int		 sd, opt, rcvbuf, defrcvbuf;
 	socklen_t	 optlen;
 
 	mib[0] = CTL_NET;
@@ -1089,7 +1089,8 @@ void
 if_deladdr(unsigned short ifindex, struct sockaddr *ifa, struct sockaddr *mask)
 {
 	struct intf_data	*id;
-	struct intf_addr	 iac, *ia, *ian;
+	struct intf_addr	*ia, *ian;
+	struct intf_addr	 iac;
 	struct sockaddr_in	*ifa4, *mask4;
 	struct sockaddr_in6	*ifa6, *mask6;
 	int			 regagain = 0;
@@ -1170,7 +1171,7 @@ if_deladdr(unsigned short ifindex, struct sockaddr *ifa, struct sockaddr *mask)
 	}
 }
 
-#define	ROUNDUP(a)	\
+#define	ROUNDUP(a) \
     (((a) & (sizeof(long) - 1)) ? (1 + ((a) | (sizeof(long) - 1))) : (a))
 
 void
@@ -1194,7 +1195,8 @@ rtmsg_process(const uint8_t *buf, size_t len)
 	struct rt_msghdr	*rtm;
 	struct if_msghdr	 ifm;
 	struct ifa_msghdr	*ifam;
-	struct sockaddr		*sa, *rti_info[RTAX_MAX];
+	struct sockaddr		*rti_info[RTAX_MAX];
+	struct sockaddr		*sa;
 	size_t			 offset;
 	const uint8_t		*next;
 

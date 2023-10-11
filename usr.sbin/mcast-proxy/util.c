@@ -321,7 +321,8 @@ mask2prefixlen(in_addr_t ina)
 uint8_t
 mask2prefixlen6(struct sockaddr_in6 *sa_in6)
 {
-	uint8_t	l = 0, *ap, *ep;
+	uint8_t	 l = 0;
+	uint8_t	*ap, *ep;
 
 	/*
 	 * sin6_len is the size of the sockaddr so subtract the offset of

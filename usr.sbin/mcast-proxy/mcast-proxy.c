@@ -77,8 +77,7 @@ main(int argc, char *argv[])
 	int		 verbose = 0, daemonize = 1, noaction = 0;
 	int		 ch, intfsd;
 	struct timeval	 qtv = { IGMP_STARTUP_QUERY_INTERVAL, 0 };
-	struct event	 igmpev, mldev, intfev, qtimerev;
-	struct event	 hupev, termev, intev;
+	struct event	 hupev, igmpev, intev, intfev, mldev, qtimerev, termev;
 
 	config_setdefaults();
 
@@ -394,9 +393,8 @@ mcast_mquery6(struct intf_data *id, struct in6_addr *dst,
 	struct sockaddr_storage	 to;
 	struct iovec		 iov[1];
 	uint8_t			 b[2048];
-	uint8_t			 cmsgbuf[
-	    CMSG_SPACE(sizeof(struct in6_pktinfo))
-	];
+	uint8_t			 cmsgbuf[CMSG_SPACE(sizeof(struct in6_pktinfo))
+	    ];
 
 	if ((ia = intf_ipv6linklayer(id)) == NULL) {
 		log_debug("%s doesn't have an address", id->id_name);
@@ -722,9 +720,7 @@ mld_recv(int sd, __unused short ev, __unused void *arg)
 	struct iovec			 iov[1];
 	struct sockaddr_storage		 ss;
 	uint8_t				 iovbuf[2048];
-	uint8_t				 cmsgbuf[
-		CMSG_SPACE(sizeof(*ipi6))
-	];
+	uint8_t				 cmsgbuf[CMSG_SPACE(sizeof(*ipi6))];
 
 	iov[0].iov_base = iovbuf;
 	iov[0].iov_len = sizeof(iovbuf);

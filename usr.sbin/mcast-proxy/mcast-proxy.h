@@ -111,11 +111,11 @@ struct intf_data {
 SLIST_HEAD(iflist, intf_data);
 
 struct multicast_origin {
-	LIST_ENTRY(multicast_origin) mo_entry;
-	int			 mo_alive;
-	int			 mo_af;
-	struct intf_data	*mo_id;
-	union uaddr		 mo_addr;
+	LIST_ENTRY(multicast_origin)	 mo_entry;
+	int				 mo_alive;
+	int				 mo_af;
+	struct intf_data		*mo_id;
+	union uaddr			 mo_addr;
 };
 LIST_HEAD(molist, multicast_origin);
 

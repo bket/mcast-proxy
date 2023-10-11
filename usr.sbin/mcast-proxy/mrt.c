@@ -38,21 +38,21 @@ enum mr_state {
 };
 
 struct multicast_route {
-	RB_ENTRY(multicast_route) mr_entry;
+	RB_ENTRY(multicast_route)	 mr_entry;
 
-	enum mr_state	 mr_state;
-	enum mr_version	 mr_version;
-	int		 mr_af;
-	union uaddr	 mr_group;
-	struct event	 mr_timer;
+	enum mr_state			 mr_state;
+	enum mr_version			 mr_version;
+	int				 mr_af;
+	union uaddr			 mr_group;
+	struct event			 mr_timer;
 	/* Version timer. */
-	struct event	 mr_vtimer;
+	struct event			 mr_vtimer;
 	/* Lowest version recorded during the version timer. */
-	enum mr_version	 mr_lowestversion;
-	struct intf_data *mr_upstream;
+	enum mr_version			 mr_lowestversion;
+	struct intf_data		*mr_upstream;
 
 	/* Origin list. */
-	struct molist	 mr_molist;
+	struct molist			 mr_molist;
 };
 RB_HEAD(mrtree, multicast_route) mrtree = RB_INITIALIZER(&mrtree);
 
