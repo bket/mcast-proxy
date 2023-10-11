@@ -18,6 +18,7 @@
 
 #include <arpa/inet.h>
 
+#include <sys/socket.h>
 #include <sys/time.h>
 
 #include <netinet/in.h>
@@ -26,13 +27,16 @@
 #include <netinet/icmp6.h>
 #include <netinet/igmp.h>
 
+#include <event.h>
 #include <pwd.h>
 #include <signal.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 #include <unistd.h>
 
+#include "log.h"
 #include "mcast-proxy.h"
 
 __dead void usage(void);

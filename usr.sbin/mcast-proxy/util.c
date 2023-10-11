@@ -18,9 +18,18 @@
 
 #include <arpa/inet.h>
 
+#include <sys/queue.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+
+#include <netinet/in.h>
+
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
+#include "log.h"
 #include "mcast-proxy.h"
 
 const char *

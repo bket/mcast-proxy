@@ -26,17 +26,20 @@
 %{
 #include <arpa/inet.h>
 
-#include <sys/limits.h>
 #include <sys/queue.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 
 #include <ctype.h>
 #include <err.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <syslog.h>
 #include <unistd.h>
 
+#include "log.h"
 #include "mcast-proxy.h"
 
 struct file {

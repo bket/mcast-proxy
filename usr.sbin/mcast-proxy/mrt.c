@@ -16,11 +16,20 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <arpa/inet.h>
+
+#include <sys/queue.h>
+#include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/tree.h>
 
+#include <netinet/in.h>
+
+#include <event.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "log.h"
 #include "mcast-proxy.h"
 
 enum mr_state {

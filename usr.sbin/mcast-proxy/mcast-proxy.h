@@ -20,16 +20,13 @@
 #define MCAST_PROXY_H
 
 #include <arpa/inet.h>
+
 #include <sys/queue.h>
-#include <sys/socket.h>
-#include <sys/types.h>
 
-#include <netinet/in.h>
 #include <net/if.h>
+#include <netinet/in.h>
 
-#include <event.h>
-
-#include "log.h"
+#include <stdint.h>
 
 #define MCAST_PROXY_USER		"_mcastproxy"
 
@@ -48,6 +45,8 @@
 
 /* Signalize invalid virtual/multicast interface index. */
 #define INVALID_VINDEX ((uint16_t)-1)
+
+struct sockaddr_storage;
 
 /* Interface direction configuration values. */
 enum intf_direction {

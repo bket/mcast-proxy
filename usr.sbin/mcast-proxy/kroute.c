@@ -16,10 +16,14 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <sys/param.h>
-#include <sys/sysctl.h>
-#include <sys/socket.h>
+#include <arpa/inet.h>
 
+#include <sys/param.h>
+#include <sys/queue.h>
+#include <sys/socket.h>
+#include <sys/sysctl.h>
+
+#include <net/if.h>
 #include <net/if_dl.h>
 #include <net/route.h>
 #include <netinet/in.h>
@@ -27,10 +31,12 @@
 #include <netinet6/ip6_mroute.h>
 
 #include <errno.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
+#include "log.h"
 #include "mcast-proxy.h"
 
 #define MAX_RTSOCK_BUF	(128 * 1024)

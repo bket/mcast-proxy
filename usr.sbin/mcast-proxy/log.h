@@ -20,7 +20,6 @@
 #define LOG_H
 
 #include <stdarg.h>
-#include <syslog.h>
 
 void	log_init(int, int);
 void	log_procinit(const char *);
