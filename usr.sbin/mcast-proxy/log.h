@@ -19,8 +19,6 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include <sys/cdefs.h>
-
 #include <stdarg.h>
 #include <syslog.h>
 
