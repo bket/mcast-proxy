@@ -119,7 +119,7 @@ struct multicast_origin {
 };
 LIST_HEAD(molist, multicast_origin);
 
-struct igmpproxy_conf {
+struct mcastproxy_conf {
 	int			 ic_ipv4;
 	int			 ic_ipv6;
 };
@@ -129,7 +129,7 @@ extern struct intf_data		*upstreamif;
 extern struct iflist		 iflist;
 extern int			 igmpsd;
 extern int			 mldsd;
-extern struct igmpproxy_conf	 ic;
+extern struct mcastproxy_conf	 ic;
 
 /* kroute.c */
 void assert_mcastforward(void);

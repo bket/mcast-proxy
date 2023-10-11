@@ -68,7 +68,7 @@ int			 igmpsd = -1;
 int			 mldsd = -1;
 
 const char		*config_file = "/etc/mcast-proxy.conf";
-struct igmpproxy_conf	 ic;
+struct mcastproxy_conf	 ic;
 
 int
 main(int argc, char *argv[])
