@@ -139,7 +139,7 @@ mrt_addorigin(struct multicast_route *mr, struct intf_data *id,
 			    &mr->mr_group, &mr->mr_molist);
 	}
 
-	/* Do not keep upstream as item on the group list. */
+	/* Do not keep upstream as item on the origin list. */
 	if (id == upstreamif) {
 		LIST_REMOVE(mo, mo_entry);
 		free(mo);
@@ -153,7 +153,7 @@ _mrt_delorigin(struct multicast_route *mr, struct multicast_origin *mo)
 
 	if (mr->mr_upstream != NULL) {
 		/*
-		 * If this was the last item of the group list we can
+		 * If this was the last item of the origin list we can
 		 * uninstall the whole group, otherwise update the
 		 * installed routes with the current origins.
 		 */
