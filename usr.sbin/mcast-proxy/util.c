@@ -32,15 +32,17 @@
 #include "log.h"
 #include "mcast-proxy.h"
 
+#define NUM_BUFS	4
+
 const char *
 addrtostr(struct sockaddr_storage *ss)
 {
 	struct sockaddr_in	*sin;
 	struct sockaddr_in6	*sin6;
-	static char		 buf[4][128];
+	static char		 buf[NUM_BUFS][INET6_ADDRSTRLEN];
 	static unsigned int	 bufpos = 0;
 
-	bufpos = (bufpos + 1) % 4;
+	bufpos = (bufpos + 1) % NUM_BUFS;
 
 	switch (ss->ss_family) {
 	case AF_INET:
@@ -50,10 +52,8 @@ addrtostr(struct sockaddr_storage *ss)
 		return buf[bufpos];
 	case AF_INET6:
 		sin6 = sstosin6(ss);
-		buf[bufpos][0] = '[';
-		inet_ntop(AF_INET6, &sin6->sin6_addr, &buf[bufpos][1],
+		inet_ntop(AF_INET6, &sin6->sin6_addr, buf[bufpos],
 		    sizeof(buf[bufpos]));
-		strlcat(buf[bufpos], "]", sizeof(buf[bufpos]));
 		return buf[bufpos];
 
 	default:
