@@ -105,7 +105,7 @@ main(int argc, char *argv[])
 			noaction = 1;
 			break;
 		case 'v':
-			verbose = 2;
+			verbose = 1;
 			break;
 		default:
 			usage();
