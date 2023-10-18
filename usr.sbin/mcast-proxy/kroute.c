@@ -22,6 +22,7 @@
 #include <sys/queue.h>
 #include <sys/socket.h>
 #include <sys/sysctl.h>
+#include <sys/tree.h>
 
 #include <net/if.h>
 #include <net/if_dl.h>
@@ -661,7 +662,7 @@ mcast6_leave(struct intf_data *id, struct in6_addr *in6)
 
 int
 mcast_addroute(unsigned short pvidx, union uaddr *origin,
-    union uaddr *group, struct molist *molist)
+    union uaddr *group, struct motree *motree)
 {
 	struct intf_data	*id;
 	struct multicast_origin	*mo;
@@ -672,7 +673,7 @@ mcast_addroute(unsigned short pvidx, union uaddr *origin,
 	mfcc.mfcc_origin = origin->v4;
 	mfcc.mfcc_mcastgrp = group->v4;
 	mfcc.mfcc_parent = pvidx;
-	LIST_FOREACH(mo, molist, mo_entry) {
+	RB_FOREACH(mo, motree, motree) {
 		id = mo->mo_id;
 
 		/* Don't set upstream interface TTL. */
@@ -690,7 +691,7 @@ mcast_addroute(unsigned short pvidx, union uaddr *origin,
 	    __func__, addr4tostr(&origin->v4), addr4tostr(&group->v4),
 	    pvidx);
 
-	LIST_FOREACH(mo, molist, mo_entry) {
+	RB_FOREACH(mo, motree, motree) {
 		id = mo->mo_id;
 		vidx = id->id_vindex;
 		if (vidx > MAXVIFS)
@@ -715,7 +716,7 @@ mcast_addroute(unsigned short pvidx, union uaddr *origin,
 
 int
 mcast_addroute6(unsigned short pvidx, union uaddr *origin,
-    union uaddr *group, struct molist *molist)
+    union uaddr *group, struct motree *motree)
 {
 	struct intf_data	*id;
 	struct multicast_origin	*mo;
@@ -730,7 +731,7 @@ mcast_addroute6(unsigned short pvidx, union uaddr *origin,
 	mf6cc.mf6cc_mcastgrp.sin6_family = AF_INET6;
 	mf6cc.mf6cc_mcastgrp.sin6_addr = group->v6;
 	mf6cc.mf6cc_mcastgrp.sin6_len = sizeof(mf6cc.mf6cc_mcastgrp);
-	LIST_FOREACH(mo, molist, mo_entry) {
+	RB_FOREACH(mo, motree, motree) {
 		id = mo->mo_id;
 
 		/* Don't set upstream interface. */
@@ -748,7 +749,7 @@ mcast_addroute6(unsigned short pvidx, union uaddr *origin,
 	    __func__, addr6tostr(&origin->v6), addr6tostr(&group->v6),
 	    pvidx);
 
-	LIST_FOREACH(mo, molist, mo_entry) {
+	RB_FOREACH(mo, motree, motree) {
 		id = mo->mo_id;
 		vidx = id->id_vindex6;
 		if (vidx > MAXMIFS)

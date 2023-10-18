@@ -18,7 +18,6 @@
 
 #include <arpa/inet.h>
 
-#include <sys/queue.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <sys/tree.h>
@@ -51,12 +50,12 @@ struct multicast_route {
 	enum mr_version			 mr_lowestversion;
 	struct intf_data		*mr_upstream;
 
-	/* Origin list. */
-	struct molist			 mr_molist;
+	/* Origin tree. */
+	struct motree			 mr_motree;
 };
 RB_HEAD(mrtree, multicast_route) mrtree = RB_INITIALIZER(&mrtree);
 
-struct multicast_origin *mo_lookup(struct molist *, struct intf_data *,
+struct multicast_origin *mo_lookup(struct motree *, struct intf_data *,
     union uaddr *);
 void mrt_addorigin(struct multicast_route *, struct intf_data *, union uaddr *);
 void _mrt_delorigin(struct multicast_route *, struct multicast_origin *);
@@ -75,12 +74,12 @@ RB_PROTOTYPE(mrtree, multicast_route, mr_entry, mrcmp);
 void mrt_nextstate(struct multicast_route *);
 
 struct multicast_origin *
-mo_lookup(struct molist *molist, struct intf_data *id, union uaddr *addr)
+mo_lookup(struct motree *motree, struct intf_data *id, union uaddr *addr)
 {
 	struct multicast_origin	*mo;
 	size_t			 addrsize;
 
-	LIST_FOREACH(mo, molist, mo_entry) {
+	RB_FOREACH(mo, motree, motree) {
 		addrsize = (mo->mo_af == AF_INET) ?
 		    sizeof(addr->v4) : sizeof(addr->v6);
 		if (id != NULL && id != mo->mo_id)
@@ -98,18 +97,18 @@ void
 mrt_addorigin(struct multicast_route *mr, struct intf_data *id,
     union uaddr *addr)
 {
-	struct multicast_origin	*mo;
+	struct multicast_origin	*mo, *mon;
 
-	mo = mo_lookup(&mr->mr_molist, id, addr);
+	mo = mo_lookup(&mr->mr_motree, id, addr);
 	if (mo != NULL) {
 		/* Update the kernel routes in case they have expired. */
 		if (mr->mr_upstream != NULL) {
 			if (mo->mo_af == AF_INET)
 				mcast_addroute(mr->mr_upstream->id_vindex,
-				    addr, &mr->mr_group, &mr->mr_molist);
+				    addr, &mr->mr_group, &mr->mr_motree);
 			else
 				mcast_addroute6(mr->mr_upstream->id_vindex6,
-				    addr, &mr->mr_group, &mr->mr_molist);
+				    addr, &mr->mr_group, &mr->mr_motree);
 		}
 		mo->mo_alive = 1;
 		return;
@@ -121,27 +120,32 @@ mrt_addorigin(struct multicast_route *mr, struct intf_data *id,
 		return;
 	}
 
-	LIST_INSERT_HEAD(&mr->mr_molist, mo, mo_entry);
-
 	mo->mo_alive = 1;
 	mo->mo_id = id;
 	mo->mo_af = mr->mr_af;
 	mo->mo_addr = *addr;
+
+	mon = RB_INSERT(motree, &mr->mr_motree, mo);
+	if (mon != NULL) {
+		free(mo);
+		mo = mon;
+	}
+
 	if (id == upstreamif || mr->mr_upstream) {
 		if (mr->mr_upstream == NULL)
 			mr->mr_upstream = upstreamif;
 
 		if (mo->mo_af == AF_INET)
 			mcast_addroute(mr->mr_upstream->id_vindex, addr,
-			    &mr->mr_group, &mr->mr_molist);
+			    &mr->mr_group, &mr->mr_motree);
 		else
 			mcast_addroute6(mr->mr_upstream->id_vindex6, addr,
-			    &mr->mr_group, &mr->mr_molist);
+			    &mr->mr_group, &mr->mr_motree);
 	}
 
-	/* Do not keep upstream as item on the origin list. */
+	/* Do not keep upstream as node in the origin tree. */
 	if (id == upstreamif) {
-		LIST_REMOVE(mo, mo_entry);
+		RB_REMOVE(motree, &mr->mr_motree, mo);
 		free(mo);
 	}
 }
@@ -149,15 +153,15 @@ mrt_addorigin(struct multicast_route *mr, struct intf_data *id,
 void
 _mrt_delorigin(struct multicast_route *mr, struct multicast_origin *mo)
 {
-	LIST_REMOVE(mo, mo_entry);
+	RB_REMOVE(motree, &mr->mr_motree, mo);
 
 	if (mr->mr_upstream != NULL) {
 		/*
-		 * If this was the last item of the origin list we can
+		 * If this was the last node in the origin tree we can
 		 * uninstall the whole group, otherwise update the
 		 * installed routes with the current origins.
 		 */
-		if (LIST_EMPTY(&mr->mr_molist)) {
+		if (RB_EMPTY(&mr->mr_motree)) {
 			if (mo->mo_af == AF_INET)
 				mcast_delroute(mr->mr_upstream->id_vindex,
 				    &mo->mo_addr, &mr->mr_group);
@@ -168,11 +172,11 @@ _mrt_delorigin(struct multicast_route *mr, struct multicast_origin *mo)
 			if (mo->mo_af == AF_INET)
 				mcast_addroute(mr->mr_upstream->id_vindex,
 				    &mo->mo_addr, &mr->mr_group,
-				    &mr->mr_molist);
+				    &mr->mr_motree);
 			else
 				mcast_addroute6(mr->mr_upstream->id_vindex6,
 				    &mo->mo_addr, &mr->mr_group,
-				    &mr->mr_molist);
+				    &mr->mr_motree);
 		}
 	}
 
@@ -185,7 +189,7 @@ mrt_delorigin(struct multicast_route *mr, struct intf_data *id,
 {
 	struct multicast_origin	*mo;
 
-	mo = mo_lookup(&mr->mr_molist, id, addr);
+	mo = mo_lookup(&mr->mr_motree, id, addr);
 	if (mo == NULL)
 		return;
 
@@ -233,7 +237,7 @@ mrt_timer(__unused int sd, __unused short ev, void *arg)
 		    __func__, addr6tostr(&mr->mr_group.v6));
 
 	/* Remove origins that did not respond. */
-	LIST_FOREACH_SAFE(mo, &mr->mr_molist, mo_entry, mon) {
+	RB_FOREACH_SAFE(mo, motree, &mr->mr_motree, mon) {
 		if (mo->mo_alive) {
 			/* Mark as dead until next update. */
 			mo->mo_alive = 0;
@@ -246,7 +250,7 @@ mrt_timer(__unused int sd, __unused short ev, void *arg)
 	mrt_nextstate(mr);
 
 	/* Remove the group if there is no more origins. */
-	if (LIST_EMPTY(&mr->mr_molist))
+	if (RB_EMPTY(&mr->mr_motree))
 		mrt_free(mr);
 }
 
@@ -298,7 +302,7 @@ mrt_new(void)
 	mr->mr_state = MS_NOTJOINED;
 	mr->mr_version = MV_IGMPV3;
 	mr->mr_lowestversion = MV_IGMPV3;
-	LIST_INIT(&mr->mr_molist);
+	RB_INIT(&mr->mr_motree);
 
 	evtimer_set(&mr->mr_timer, mrt_timer, mr);
 	evtimer_set(&mr->mr_vtimer, mrt_vtimer, mr);
@@ -321,7 +325,7 @@ mrt_free(struct multicast_route *mr)
 	if (evtimer_pending(&mr->mr_vtimer, &tv))
 		evtimer_del(&mr->mr_vtimer);
 
-	LIST_FOREACH_SAFE(mo, &mr->mr_molist, mo_entry, mon)
+	RB_FOREACH_SAFE(mo, motree, &mr->mr_motree, mon)
 		_mrt_delorigin(mr, mo);
 
 	ss.ss_family = mr->mr_af;
@@ -426,7 +430,7 @@ mrt_remove4(struct intf_data *id, struct in_addr *origin,
 	uorigin.v4 = *origin;
 	mrt_delorigin(mr, id, &uorigin);
 	mrt_nextstate(mr);
-	if (LIST_EMPTY(&mr->mr_molist))
+	if (RB_EMPTY(&mr->mr_motree))
 		mrt_free(mr);
 }
 
@@ -506,7 +510,7 @@ mrt_remove6(struct intf_data *id, struct in6_addr *origin,
 	uorigin.v6 = *origin;
 	mrt_delorigin(mr, id, &uorigin);
 	mrt_nextstate(mr);
-	if (LIST_EMPTY(&mr->mr_molist))
+	if (RB_EMPTY(&mr->mr_motree))
 		mrt_free(mr);
 }
 
@@ -536,7 +540,7 @@ mrt_nextstate(struct multicast_route *mr)
 	switch (mr->mr_state) {
 	case MS_NOTJOINED:
 		/* Don't join if there is no interest. */
-		if (LIST_EMPTY(&mr->mr_molist))
+		if (RB_EMPTY(&mr->mr_motree))
 			return;
 
 		mcast_join(upstreamif, &ss);
@@ -545,7 +549,7 @@ mrt_nextstate(struct multicast_route *mr)
 
 	case MS_JOINED:
 		/* Don't leave if there is still peers. */
-		if (!LIST_EMPTY(&mr->mr_molist))
+		if (!RB_EMPTY(&mr->mr_motree))
 			return;
 
 		mcast_leave(upstreamif, &ss);
@@ -575,4 +579,22 @@ mrcmp(struct multicast_route *mr1, struct multicast_route *mr2)
 	    sizeof(mr1->mr_group.v4) : sizeof(mr1->mr_group.v6);
 
 	return memcmp(&mr1->mr_group, &mr2->mr_group, addrsize);
+}
+
+RB_GENERATE(motree, multicast_origin, mo_entry, mocmp);
+
+int
+mocmp(struct multicast_origin *mo1, struct multicast_origin *mo2)
+{
+	size_t			 addrsize;
+
+	if (mo1->mo_af > mo2->mo_af)
+		return 1;
+	else if (mo1->mo_af < mo2->mo_af)
+		return -1;
+
+	addrsize = (mo1->mo_af == AF_INET) ?
+	    sizeof(mo1->mo_addr.v4) : sizeof(mo1->mo_addr.v6);
+
+	return memcmp(&mo1->mo_addr, &mo2->mo_addr, addrsize);
 }

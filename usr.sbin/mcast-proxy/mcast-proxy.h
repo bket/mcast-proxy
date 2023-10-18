@@ -22,6 +22,7 @@
 #include <arpa/inet.h>
 
 #include <sys/queue.h>
+#include <sys/tree.h>
 
 #include <net/if.h>
 #include <netinet/in.h>
@@ -111,13 +112,13 @@ struct intf_data {
 SLIST_HEAD(iflist, intf_data);
 
 struct multicast_origin {
-	LIST_ENTRY(multicast_origin)	 mo_entry;
+	RB_ENTRY(multicast_origin)	 mo_entry;
 	int				 mo_alive;
 	int				 mo_af;
 	struct intf_data		*mo_id;
 	union uaddr			 mo_addr;
 };
-LIST_HEAD(molist, multicast_origin);
+RB_HEAD(motree, multicast_origin);
 
 struct mcastproxy_conf {
 	int			 ic_ipv4;
@@ -154,9 +155,9 @@ int mcast4_leave(struct intf_data *, struct in_addr *);
 int mcast6_join(struct intf_data *, struct in6_addr *);
 int mcast6_leave(struct intf_data *, struct in6_addr *);
 int mcast_addroute(unsigned short, union uaddr *, union uaddr *,
-    struct molist *);
+    struct motree *);
 int mcast_addroute6(unsigned short, union uaddr *, union uaddr *,
-    struct molist *);
+    struct motree *);
 int mcast_delroute(unsigned short, union uaddr *, union uaddr *);
 int mcast_delroute6(unsigned short, union uaddr *, union uaddr *);
 
@@ -192,6 +193,8 @@ struct multicast_route *mrt_insert6(enum mr_version, struct intf_data *,
 void mrt_remove4(struct intf_data *, struct in_addr *, struct in_addr *);
 void mrt_remove6(struct intf_data *, struct in6_addr *, struct in6_addr *);
 void mrt_cleanup(void);
+int mocmp(struct multicast_origin *, struct multicast_origin *);
+RB_PROTOTYPE(motree, multicast_origin, mo_entry, mocmp);
 
 /* parse.y */
 int cmdline_symset(const char *);
