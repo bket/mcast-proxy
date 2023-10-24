@@ -99,21 +99,6 @@ mrt_addorigin(struct multicast_route *mr, struct intf_data *id,
 {
 	struct multicast_origin	*mo, *mon;
 
-	mo = mo_lookup(&mr->mr_motree, id, addr);
-	if (mo != NULL) {
-		/* Update the kernel routes in case they have expired. */
-		if (mr->mr_upstream != NULL) {
-			if (mo->mo_af == AF_INET)
-				mcast_addroute(mr->mr_upstream->id_vindex,
-				    addr, &mr->mr_group, &mr->mr_motree);
-			else
-				mcast_addroute6(mr->mr_upstream->id_vindex6,
-				    addr, &mr->mr_group, &mr->mr_motree);
-		}
-		mo->mo_alive = 1;
-		return;
-	}
-
 	mo = calloc(1, sizeof(*mo));
 	if (mo == NULL) {
 		log_warn("%s: calloc", __func__);
@@ -129,6 +114,18 @@ mrt_addorigin(struct multicast_route *mr, struct intf_data *id,
 	if (mon != NULL) {
 		free(mo);
 		mo = mon;
+
+		/* Update the kernel routes in case they have expired. */
+		if (mr->mr_upstream != NULL) {
+			if (mo->mo_af == AF_INET)
+				mcast_addroute(mr->mr_upstream->id_vindex,
+				    addr, &mr->mr_group, &mr->mr_motree);
+			else
+				mcast_addroute6(mr->mr_upstream->id_vindex6,
+				    addr, &mr->mr_group, &mr->mr_motree);
+		}
+		mo->mo_alive = 1;
+		return;
 	}
 
 	if (id == upstreamif || mr->mr_upstream) {
