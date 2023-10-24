@@ -55,8 +55,6 @@ struct multicast_route {
 };
 RB_HEAD(mrtree, multicast_route) mrtree = RB_INITIALIZER(&mrtree);
 
-struct multicast_origin *mo_lookup(struct motree *, struct intf_data *,
-    union uaddr *);
 void mrt_addorigin(struct multicast_route *, struct intf_data *, union uaddr *);
 void _mrt_delorigin(struct multicast_route *, struct multicast_origin *);
 void mrt_delorigin(struct multicast_route *, struct intf_data *, union uaddr *);
@@ -72,26 +70,6 @@ struct multicast_route *mrt_find6(struct in6_addr *);
 int mrcmp(struct multicast_route *, struct multicast_route *);
 RB_PROTOTYPE(mrtree, multicast_route, mr_entry, mrcmp);
 void mrt_nextstate(struct multicast_route *);
-
-struct multicast_origin *
-mo_lookup(struct motree *motree, struct intf_data *id, union uaddr *addr)
-{
-	struct multicast_origin	*mo;
-	size_t			 addrsize;
-
-	RB_FOREACH(mo, motree, motree) {
-		addrsize = (mo->mo_af == AF_INET) ?
-		    sizeof(addr->v4) : sizeof(addr->v6);
-		if (id != NULL && id != mo->mo_id)
-			continue;
-		if (memcmp(addr, &mo->mo_addr, addrsize) != 0)
-			continue;
-
-		return mo;
-	}
-
-	return NULL;
-}
 
 void
 mrt_addorigin(struct multicast_route *mr, struct intf_data *id,
