@@ -185,8 +185,13 @@ mrt_delorigin(struct multicast_route *mr, struct intf_data *id,
     union uaddr *addr)
 {
 	struct multicast_origin	*mo;
+	struct multicast_origin	 key;
 
-	mo = mo_lookup(&mr->mr_motree, id, addr);
+	memset(&key, 0, sizeof(key));
+	key.mo_af = mr->mr_af;
+	key.mo_addr = *addr;
+	mo = RB_FIND(motree, &mr->mr_motree, &key);
+
 	if (mo == NULL)
 		return;
 
