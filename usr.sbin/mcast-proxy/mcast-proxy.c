@@ -619,7 +619,7 @@ igmp_recv(int fd, __unused short ev, __unused void *arg)
 			return;
 		}
 
-		mrt_remove4(id, &sstosin(&src)->sin_addr, &igmp->igmp_group);
+		mrt_remove4(&sstosin(&src)->sin_addr, &igmp->igmp_group);
 		break;
 	}
 }
@@ -697,7 +697,7 @@ mld_parse(struct intf_data *id, struct sockaddr_storage *src,
 		    &mld->mld_addr);
 		break;
 	case MLD_LISTENER_DONE:
-		mrt_remove6(id, &sstosin6(src)->sin6_addr, &mld->mld_addr);
+		mrt_remove6(&sstosin6(src)->sin6_addr, &mld->mld_addr);
 		break;
 
 	default:

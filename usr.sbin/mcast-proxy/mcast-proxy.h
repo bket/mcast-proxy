@@ -190,8 +190,8 @@ struct multicast_route *mrt_insert4(enum mr_version, struct intf_data *,
     struct in_addr *, struct in_addr *);
 struct multicast_route *mrt_insert6(enum mr_version, struct intf_data *,
     struct in6_addr *, struct in6_addr *);
-void mrt_remove4(struct intf_data *, struct in_addr *, struct in_addr *);
-void mrt_remove6(struct intf_data *, struct in6_addr *, struct in6_addr *);
+void mrt_remove4(struct in_addr *, struct in_addr *);
+void mrt_remove6(struct in6_addr *, struct in6_addr *);
 void mrt_cleanup(void);
 int mocmp(struct multicast_origin *, struct multicast_origin *);
 RB_PROTOTYPE(motree, multicast_origin, mo_entry, mocmp);

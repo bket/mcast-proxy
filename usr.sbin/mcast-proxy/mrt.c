@@ -57,7 +57,7 @@ RB_HEAD(mrtree, multicast_route) mrtree = RB_INITIALIZER(&mrtree);
 
 void mrt_addorigin(struct multicast_route *, struct intf_data *, union uaddr *);
 void _mrt_delorigin(struct multicast_route *, struct multicast_origin *);
-void mrt_delorigin(struct multicast_route *, struct intf_data *, union uaddr *);
+void mrt_delorigin(struct multicast_route *, union uaddr *);
 
 void mrt_timeradd(struct event *);
 void mrt_timer(int, short, void *);
@@ -159,8 +159,7 @@ _mrt_delorigin(struct multicast_route *mr, struct multicast_origin *mo)
 }
 
 void
-mrt_delorigin(struct multicast_route *mr, struct intf_data *id,
-    union uaddr *addr)
+mrt_delorigin(struct multicast_route *mr, union uaddr *addr)
 {
 	struct multicast_origin	*mo;
 	struct multicast_origin	 key;
@@ -393,8 +392,7 @@ mrt_insert4(enum mr_version mv, struct intf_data *id,
 }
 
 void
-mrt_remove4(struct intf_data *id, struct in_addr *origin,
-    struct in_addr *group)
+mrt_remove4(struct in_addr *origin, struct in_addr *group)
 {
 	struct multicast_route	*mr;
 	union uaddr		 uorigin;
@@ -408,7 +406,7 @@ mrt_remove4(struct intf_data *id, struct in_addr *origin,
 		return;
 
 	uorigin.v4 = *origin;
-	mrt_delorigin(mr, id, &uorigin);
+	mrt_delorigin(mr, &uorigin);
 	mrt_nextstate(mr);
 	if (RB_EMPTY(&mr->mr_motree))
 		mrt_free(mr);
@@ -477,8 +475,7 @@ mrt_insert6(enum mr_version mv, struct intf_data *id,
 }
 
 void
-mrt_remove6(struct intf_data *id, struct in6_addr *origin,
-    struct in6_addr *group)
+mrt_remove6(struct in6_addr *origin, struct in6_addr *group)
 {
 	struct multicast_route	*mr;
 	union uaddr		 uorigin;
@@ -488,7 +485,7 @@ mrt_remove6(struct intf_data *id, struct in6_addr *origin,
 		return;
 
 	uorigin.v6 = *origin;
-	mrt_delorigin(mr, id, &uorigin);
+	mrt_delorigin(mr, &uorigin);
 	mrt_nextstate(mr);
 	if (RB_EMPTY(&mr->mr_motree))
 		mrt_free(mr);
