@@ -681,7 +681,7 @@ mcast_addroute(unsigned short pvidx, union uaddr *origin,
 			continue;
 
 		vidx = id->id_vindex;
-		if (vidx > MAXVIFS)
+		if (vidx >= MAXVIFS)
 			continue;
 
 		mfcc.mfcc_ttls[vidx] = id->id_ttl;
@@ -694,7 +694,7 @@ mcast_addroute(unsigned short pvidx, union uaddr *origin,
 	RB_FOREACH(mo, motree, motree) {
 		id = mo->mo_id;
 		vidx = id->id_vindex;
-		if (vidx > MAXVIFS)
+		if (vidx >= MAXVIFS)
 			continue;
 
 		if (mfcc.mfcc_ttls[vidx])
