@@ -16,13 +16,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <arpa/inet.h>
-
 #include <sys/param.h>
 #include <sys/queue.h>
 #include <sys/socket.h>
 #include <sys/sysctl.h>
 #include <sys/tree.h>
+#include <sys/types.h>
 
 #include <net/if.h>
 #include <net/if_dl.h>
@@ -30,6 +29,8 @@
 #include <netinet/in.h>
 #include <netinet/ip_mroute.h>
 #include <netinet6/ip6_mroute.h>
+
+#include <arpa/inet.h>
 
 #include <errno.h>
 #include <stdint.h>

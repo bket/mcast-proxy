@@ -16,13 +16,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <arpa/inet.h>
-
 #include <sys/queue.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
 #include <netinet/in.h>
+
+#include <arpa/inet.h>
 
 #include <stdint.h>
 #include <stdlib.h>

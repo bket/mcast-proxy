@@ -19,8 +19,6 @@
 #ifndef MCAST_PROXY_H
 #define MCAST_PROXY_H
 
-#include <arpa/inet.h>
-
 #include <sys/queue.h>
 #include <sys/tree.h>
 

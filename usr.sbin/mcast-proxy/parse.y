@@ -24,11 +24,11 @@
  */
 
 %{
-#include <arpa/inet.h>
-
 #include <sys/queue.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+
+#include <arpa/inet.h>
 
 #include <ctype.h>
 #include <err.h>

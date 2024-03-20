@@ -19,6 +19,8 @@
 #ifndef LOG_H
 #define LOG_H
 
+#include <sys/types.h>
+
 #include <stdarg.h>
 
 void	log_init(int, int);
